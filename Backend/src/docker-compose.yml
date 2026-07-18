@@ -1,0 +1,41 @@
+services:
+  devops-company-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: DevOps-company-container
+    ports:
+      - "5400:5400"
+    environment:
+      - PostgresURL=postgresql://postgres:9944@DevOps_Pvt_LTD_DB:5432/DevOps_Pvt_LTD
+    depends_on:
+      - DevOps_Pvt_LTD_DB
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5400/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  DevOps_Pvt_LTD_DB:
+    image: postgres:15-alpine
+    container_name: postgres-container
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "9944"
+      POSTGRES_DB: DevOps_Pvt_LTD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  pgdata:
