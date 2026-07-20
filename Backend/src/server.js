@@ -7,7 +7,8 @@ const { Sequelize } = require('sequelize');
 const userRoutes = require('./Routes/UserRouter');
 const EducationRoutes = require('./Routes/EducationRoutes');
 const SkillRoutes = require('./Routes/SkillRoutes');
-
+const FileRoutes = require('./Routes/FileRoutes');
+const fileUplode = require('./Madules/File');
 const app = express();
 app.use(express.json());
 
@@ -25,6 +26,7 @@ app.use((req, res, next)=>{
 app.use('/api/user', userRoutes);
 app.use('/api/education', EducationRoutes);
 app.use('/api/skill', SkillRoutes);
+app.use('/api/file', FileRoutes);
 
 
 app.use((req, res)=>{

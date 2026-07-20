@@ -1,8 +1,9 @@
 const express = require('express');
 const routes = express.Router();
 
-const SkillController = require('../Controllers/SkillController');
 const {validateJWTToken} = require('../Setting/Autho');
+const SkillController = require('../Controllers/SkillController');
+
 
 routes.post('/create-skill', SkillController.CreateUserSkill);
 
