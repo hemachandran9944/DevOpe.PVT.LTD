@@ -52,4 +52,31 @@ const welComeEmail = async (Name, Gmail, Otp) => {
     }
 }
 
-module.exports = {welComeEmail};
+
+const forgotPasswordEmail = async (Name, Gmail, Otp) => {
+    try {
+        const forGetOtpMail = {
+            from: `"DevOps PVT LTD" <${process.env.EMAIL}>`,
+            to: Gmail,
+            subject: 'Password Reset Request - DevOps PVT LTD',
+            text: `Dear ${Name}\n\n`+
+                  'We received a request to reset the password associated with your account.\n\n'+
+                  'Please use the verification code below to proceed with resetting your password.\n\n'+
+                  `User Account: ${Gmail}\n` +
+                  `Verification Code: ${Otp}\n\n` + 
+                  `This code is valid for the next 10 minutes only. For your security, please do not share this code with anyone.\n\n` +
+                  'If you did not request a password reset, please ignore this email or contact our support team immediately, as your account may be at risk.\n\n'+
+                  'For any assistance, feel free to reply to this email or visit our support page.\n\n'+
+                  'Best Regards\n\n'+
+                  'The DevOps PVT LTD Team'
+        }
+        return await isMailer.sendMail(forGetOtpMail);
+    } catch (error) {
+        console.log('Forgot password email sending failed:', error);
+    }
+}
+
+
+
+module.exports = { welComeEmail, forgotPasswordEmail };
+

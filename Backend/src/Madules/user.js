@@ -54,8 +54,12 @@ users.addHook('beforeCreate', async (user) => {
 
 // Update Hook
 users.addHook('beforeUpdate', async (user) => {
-    if (user.changed('Password')) {
-        user.Password = await bcryptHash.hash(user.Password, 10);
+    try {
+        if (user.changed('Password')) {
+            user.Password = await bcryptHash.hash(user.Password, 10);
+        }
+    } catch (error) {
+        console.log('Password hasing error', error);
     }
 })
 

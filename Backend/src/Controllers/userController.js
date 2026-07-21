@@ -1,5 +1,5 @@
 const User = require('../Madules/user');
-const {welComeEmail} = require('../Setting/OptSender');
+const {welComeEmail, forgotPasswordEmail} = require('../Setting/OptSender');
 const {genarateToekn} = require('../Setting/Autho');
 const bcryptHash = require('bcrypt');
 
@@ -106,7 +106,7 @@ exports.UserLogin = async (req, res) => {
 exports.getAllUserData = async (req, res) => {
     try {
         const getuserData = await User.findAll({attributes: {exclude: ['Password', 'Otp', 'OTPExpiration', 'isVerified']}, order: [['id', 'DESC']]});
-        return res.status(200).json({status: 'success', message:'get all user data successfulley!', data: getuserData.length});
+        return res.status(200).json({status: 'success', message:'get all user data successfulley!', count: getuserData.length, data: getuserData });
     } catch (error) {
         return res.status(500).json({status:'failed', message: error.message});
     }
@@ -183,6 +183,78 @@ exports.DeleteAllUser = async (req, res) => {
     try {
         const deleteAlluser = await User.destroy({where: {}});
         return res.status(200).json({status: 'success', message: 'delete all data delete successfulley!', deleteCount: deleteAlluser});
+    } catch (error) {
+        return res.status(500).json({status: 'failed', message: error.message});
+    }
+}
+
+
+exports.ResetPasswordOpt = async (req, res) => {
+    try {
+        const {Gmail} = req.body;
+        const exit = await User.findOne({where: {Gmail}});
+        if (!exit) {
+            return res.status(404).json({status: 'failed', message: 'user not found'});
+        }
+        const optmade = Math.floor(100000 + Math.random()* 900000).toString();
+        const OptTimeOut = new Date (Date.now() + 10 * 60 * 1000);
+        const update = await exit.update({Otp: optmade, OTPExpiration: OptTimeOut});
+
+        await forgotPasswordEmail(exit.Name, Gmail, optmade);
+        return res.status(200).json({
+            status: 'success',
+            message: 'OTP sent to your email! Please check and verify.!',
+            data: {
+                Gmail: update.Gmail,
+                Name: update.Name,
+                Otp: update.Otp
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({status: 'failed', message: error.message});
+    }
+}
+
+
+
+exports.ResetPassowrd = async (req, res) => {
+    try {
+        const {Gmail, Otp, NewPaasoword, ConfirmPassword} = req.body;
+        const exiting = await User.findOne({where: {Gmail}});
+        if (!exiting) {
+            return res.status(404).json({status:'failed', message: 'user not found'});
+        }
+
+        if (exiting.Otp !== Otp) {
+            return res.status(400).json({status: 'Failed', message: 'Invalid OTP!'});
+        }
+
+        if (NewPaasoword !== ConfirmPassword) {
+            return res.status(400).json({status: 'failed', message: 'Passwords do not match!'});
+        }
+
+        if (new Date () >exiting.OTPExpiration) {
+            return res.status(400).json({status: 'failed', message: 'Otp Expired'});
+        }
+        await exiting.update({
+            Password: NewPaasoword,
+            Otp: null,
+            isVerified: true,
+            OTPExpiration: null
+        });
+        return res.status(200).json({status: 'success', message: 'Password reset successfully. Now You can login'});
+    } catch (error) {
+        return res.status(500).json({status: 'failed', message: error.message});
+    }
+}
+
+
+
+
+
+exports.LogOut = async (req, res) => {
+    try {
+        return res.status(200).json({status: 'success', message:'LogOut successfulley'});
     } catch (error) {
         return res.status(500).json({status: 'failed', message: error.message});
     }
