@@ -76,7 +76,24 @@ const forgotPasswordEmail = async (Name, Gmail, Otp) => {
     }
 }
 
+const AppleyGmail = async (Name, Gmail) => {
+    try {
+        const appleyEmail = {
+            from: `"DevOps PVT LTD" <${process.env.EMAIL}>`,
+            to: Gmail,
+            subject: 'Thank You for Applying - DevOps PVT LTD',
+            text: `Dear ${Name},\n\n`+
+                'Thank you for taking the time to apply to DevOps PVT LTD. We truly appreciate your interest in joining our team.\n\n'+
+                'Our HR team has received your application and will carefully review your profile against the requirements of the role. Should your qualifications align with what we are looking for, a member of our team will reach out to you to discuss the next steps.\n\n'+
+                'We understand that the wait can be uncertain, and we assure you that every application is given the attention it deserves.\n\n'+
+                'Thank you once again for considering DevOps PVT LTD as your next career opportunity. We wish you the very best.\n\n'+
+                'Warm Regards,\n'+
+                'The DevOps PVT LTD Recruitment Team'
+        }
+        return await isMailer.sendMail(appleyEmail);
+    } catch (error) {
+        console.log('Application email sending failed:', error);
+    }
+}
 
-
-module.exports = { welComeEmail, forgotPasswordEmail };
-
+module.exports = { welComeEmail, forgotPasswordEmail, AppleyGmail };
